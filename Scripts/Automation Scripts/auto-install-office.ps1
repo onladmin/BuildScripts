@@ -1,8 +1,8 @@
-$OfficeExe = 'https://github.com/Ray-MRQ/MRQ/raw/master/Install%20files/setup.exe'
-$OfficeXMLInstall = 'https://github.com/Ray-MRQ/MRQ/raw/master/Regkeys_xmls/configuration-Office365-x86.xml'
-$OfficeXMLUninstall = 'https://github.com/Ray-MRQ/MRQ/raw/master/Regkeys_xmls/configruation_uninstall.xml'
-$OfficeXMLHomeUninstall = 'https://github.com/Ray-MRQ/MRQ/raw/master/Regkeys_xmls/configuration_uninstall_home.xml'
-$OfficeXMLBuisnessUninstall = 'https://github.com/Ray-MRQ/MRQ/raw/master/Regkeys_xmls/configuration_uninstall_buisness.xml'
+$OfficeExe = 'https://github.com/onladmin/BuildScripts/raw/master/Install%20files/setup.exe'
+$OfficeXMLInstall = 'https://github.com/onladmin/BuildScripts/raw/master/Regkeys_xmls/configuration-Office365-x86.xml'
+$OfficeXMLUninstall = 'https://github.com/onladmin/BuildScripts/raw/master/Regkeys_xmls/configruation_uninstall.xml'
+$OfficeXMLHomeUninstall = 'https://github.com/onladmin/BuildScripts/raw/master/Regkeys_xmls/configuration_uninstall_home.xml'
+$OfficeXMLBuisnessUninstall = 'https://github.com/onladmin/BuildScripts/raw/master/Regkeys_xmls/configuration_uninstall_buisness.xml'
 
 function start-officeinstall {
     $ProgressPreference = 'SilentlyContinue'
