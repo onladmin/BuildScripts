@@ -1,21 +1,21 @@
 ﻿#Automated Build script for KAR
 # MQ 11/02/2021
 
-$SoftwareInstallChrome = 'https://github.com/Ray-MRQ/MRQ/raw/master/Install%20files/GoogleChromeStandaloneEnterprise64.msi'
-$SoftwareInstall7zip = 'https://github.com/Ray-MRQ/MRQ/raw/master/Install%20files/7z1604-x64.msi'
-$SoftwareInstallJava = 'https://github.com/Ray-MRQ/MRQ/raw/master/Install%20files/jre1.8.0_26164.msi'
-$SoftwareInstallZoomFile = 'https://github.com/Ray-MRQ/MRQ/raw/master/Install%20files/ZoomInstallerFull.msi'
+$SoftwareInstallChrome = 'https://github.com/onladmin/MRQ/raw/master/Install%20files/GoogleChromeStandaloneEnterprise64.msi'
+$SoftwareInstall7zip = 'https://github.com/onladmin/MRQ/raw/master/Install%20files/7z1604-x64.msi'
+$SoftwareInstallJava = 'https://github.com/onladmin/MRQ/raw/master/Install%20files/jre1.8.0_26164.msi'
+$SoftwareInstallZoomFile = 'https://github.com/onladmin/MRQ/raw/master/Install%20files/ZoomInstallerFull.msi'
 $SoftwareInstallAdobeReader = 'https://onl-my.sharepoint.com/:u:/g/personal/mohammed_quashem_onlinesupport_co_uk/EcRWAKSO321GgevynQeMUzkBpZ-6wm-kHKs7_uScUdfZmw?e=4bhFXR&download=1'
 $SoftwareInstallFactSect = 'https://support.factset.com/workstation/gr/64/'
 $Office365Install = 'https://github.com/onladmin/BuildScripts/raw/master/Scripts/Automation%20Scripts/auto-install-office.ps1'
-$MimecastInstall = 'https://github.com/Ray-MRQ/MRQ/raw/master/Install%20files/Mimecast%20for%20Outlook%207.0.1740.17532%20(32%20bit).msi'
-$NeteXtenderInstall= 'https://github.com/Ray-MRQ/MRQ/raw/master/Install%20files/NetExtender.8.6.265.MSI'
-$PhotoviewerInstall = 'https://github.com/Ray-MRQ/MRQ/raw/master/Regkeys_xmls/Restore_Windows_Photo_Viewer_ALL_USERS.reg'
-$DefaultAppPre1909= 'https://github.com/Ray-MRQ/MRQ/raw/master/Regkeys_xmls/Pre1909DefaultAppAssociations.xml'
-$DefaultApp = 'https://github.com/Ray-MRQ/MRQ/raw/master/Regkeys_xmls/2004AppAssociations.xml'
-#$BloatwareRemoverWin10 = 'https://github.com/Ray-MRQ/MRQ/raw/master/Scripts/Uninstall_windows10_bloatware.ps1'
-#$HPBloatwareRemover = 'https://github.com/Ray-MRQ/MRQ/raw/master/Scripts/HP-Bloatware-removal.ps1'
-#$DellBloatwareRemover = 'https://github.com/Ray-MRQ/MRQ/raw/master/Scripts/Dell-Bloatware-Removal.ps1'
+$MimecastInstall = 'https://github.com/onladmin/MRQ/raw/master/Install%20files/Mimecast%20for%20Outlook%207.0.1740.17532%20(32%20bit).msi'
+$NeteXtenderInstall= 'https://github.com/onladmin/MRQ/raw/master/Install%20files/NetExtender.8.6.265.MSI'
+$PhotoviewerInstall = 'https://github.com/onladmin/MRQ/raw/master/Regkeys_xmls/Restore_Windows_Photo_Viewer_ALL_USERS.reg'
+$DefaultAppPre1909= 'https://github.com/onladmin/MRQ/raw/master/Regkeys_xmls/Pre1909DefaultAppAssociations.xml'
+$DefaultApp = 'https://github.com/onladmin/MRQ/raw/master/Regkeys_xmls/2004AppAssociations.xml'
+#$BloatwareRemoverWin10 = 'https://github.com/onladmin/MRQ/raw/master/Scripts/Uninstall_windows10_bloatware.ps1'
+#$HPBloatwareRemover = 'https://github.com/onladmin/MRQ/raw/master/Scripts/HP-Bloatware-removal.ps1'
+#$DellBloatwareRemover = 'https://github.com/onladmin/MRQ/raw/master/Scripts/Dell-Bloatware-Removal.ps1'
 
 
 function start-software-install {
