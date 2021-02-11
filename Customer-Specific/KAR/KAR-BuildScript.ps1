@@ -32,6 +32,7 @@ function start-software-install {
   Invoke-WebRequest $Office365Install -outfile c:\temp\scriptdownloads\office365install.ps1
   Expand-Archive -LiteralPath C:\temp\scriptdownloads\adobereader.zip -DestinationPath C:\temp\scriptdownloads\
   $ProgressPreference = 'Continue'
+  powershell c:\temp\scriptdownloads\office365install.ps1
   Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\scriptdownloads\chrome.msi /qn /norestart allusers=2'
   Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\scriptdownloads\7zip.msi /qn /norestart allusers=2'
   Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\scriptdownloads\java.msi /qn /norestart allusers=2'
@@ -41,7 +42,6 @@ function start-software-install {
   Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\scriptdownloads\mimecast32bit.msi /qn /norestart allusers=2'
   Start-Process msiexec.exe -Wait -ArgumentList '/i C:\temp\scriptdownloads\netextender.msi /qn /norestart allusers=2'
   Invoke-Command {reg import C:\temp\scriptdownloads\Photoviewer.reg *>&1 | Out-Null}
-  powershell c:\temp\scriptdownloads\office365install.ps1
   Write-Output "Installed 7zip, Java, Chrome, Factsect, Zoom, Mimecast, Net extender, Office365 app and Photo viewer and Adobe reader silently."
   
 }
