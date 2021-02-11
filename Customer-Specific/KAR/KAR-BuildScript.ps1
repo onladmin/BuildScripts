@@ -190,9 +190,12 @@ function start-script {
 }
 
 function start-mainmenu {
+  Write-Output ''
   Write-Output "KAR Build Script."
+  Write-Output ''
   Write-Output "Choose option 1 for automated."
   Write-Output "Choose option 2 for the manual last steps."
+  Write-Output ''
   do { $myInput = (Read-Host 'Type an option').ToLower() } while ($myInput -notin @('1','2','3'))
 if ($myinput -eq '1') {start-script}
 if ($myinput -eq '2') {manual-script}
