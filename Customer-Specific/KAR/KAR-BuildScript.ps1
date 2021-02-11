@@ -7,7 +7,7 @@ $SoftwareInstallJava = 'https://github.com/Ray-MRQ/MRQ/raw/master/Install%20file
 $SoftwareInstallZoomFile = 'https://github.com/Ray-MRQ/MRQ/raw/master/Install%20files/ZoomInstallerFull.msi'
 $SoftwareInstallAdobeReader = 'https://onl-my.sharepoint.com/:u:/g/personal/mohammed_quashem_onlinesupport_co_uk/EcRWAKSO321GgevynQeMUzkBpZ-6wm-kHKs7_uScUdfZmw?e=4bhFXR&download=1'
 $SoftwareInstallFactSect = 'https://support.factset.com/workstation/gr/64/'
-#$Office365Install = 'https://github.com/Ray-MRQ/MRQ/raw/master/Scripts/Install_Office365Apps.ps1'
+$Office365Install = 'https://github.com/onladmin/BuildScripts/raw/master/Scripts/Automation%20Scripts/auto-install-office.ps1'
 $MimecastInstall = 'https://github.com/Ray-MRQ/MRQ/raw/master/Install%20files/Mimecast%20for%20Outlook%207.0.1740.17532%20(32%20bit).msi'
 $NeteXtenderInstall= 'https://github.com/Ray-MRQ/MRQ/raw/master/Install%20files/NetExtender.8.6.265.MSI'
 $PhotoviewerInstall = 'https://github.com/Ray-MRQ/MRQ/raw/master/Regkeys_xmls/Restore_Windows_Photo_Viewer_ALL_USERS.reg'
@@ -29,6 +29,7 @@ function start-software-install {
   Invoke-WebRequest $MimecastInstall -outfile c:\temp\scriptdownloads\mimecast32bit.msi
   Invoke-WebRequest $NeteXtenderInstall -outfile c:\temp\scriptdownloads\netextender.msi
   Invoke-WebRequest $PhotoviewerInstall -outfile c:\temp\scriptdownloads\Photoviewer.reg
+  Invoke-WebRequest $Office365Install -outfile c:\temp\scriptdownloads\office365install.ps1
   Expand-Archive -LiteralPath C:\temp\scriptdownloads\adobereader.zip -DestinationPath C:\temp\scriptdownloads\
   $ProgressPreference = 'Continue'
   Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\scriptdownloads\chrome.msi /qn /norestart allusers=2'
@@ -40,7 +41,8 @@ function start-software-install {
   Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\scriptdownloads\mimecast32bit.msi /qn /norestart allusers=2'
   Start-Process msiexec.exe -Wait -ArgumentList '/i C:\temp\scriptdownloads\netextender.msi /qn /norestart allusers=2'
   Invoke-Command {reg import C:\temp\scriptdownloads\Photoviewer.reg *>&1 | Out-Null}
-  Write-Output "Installed 7zip, Java, Chrome, Factsect, Zoom, Mimecast, Net extender and Adobe reader silently."
+  powershell c:\temp\scriptdownloads\office365install.ps1
+  Write-Output "Installed 7zip, Java, Chrome, Factsect, Zoom, Mimecast, Net extender, Office365 app and Photo viewer and Adobe reader silently."
   
 }
 function start-shortcuts-default-apps {
@@ -125,7 +127,7 @@ function start-setdefault-timzeone {
   Set-WinDefaultInputMethodOverride -InputTip "0809:00000809"
 }
 
-function start-winodws-update {
+function start-windows-update {
   if ($WindowsVerison -le $OldWindows) { 
     #Removes the Upgrader app if it's installed.
     C:\Windows10Upgrade\Windows10UpgraderApp.exe /ForceUninstall > $null 2>&1
@@ -173,4 +175,25 @@ function start-bitlocker {
   manage-bde -on C:
   Write-Output ''
   Write-Output "Stored recovery key in C:\temp\"
+}
+
+################################################
+
+function start-script {
+  start-software-install
+  start-shortcuts-default-apps
+  start-clearstartmenu
+  start-modifyuac
+  start-enablesystemrestore
+  start-setdefault-timzeone
+  start-windows-update
+}
+
+function start-mainmenu {
+  Write-Output "KAR Build Script."
+  Write-Output "Choose option 1 for automated."
+  Write-Output "Choose option 2 for the manual last steps."
+  do { $myInput = (Read-Host 'Type an option').ToLower() } while ($myInput -notin @('1','2','3'))
+if ($myinput -eq '1') {start-script}
+if ($myinput -eq '2') {manual-script}
 }
