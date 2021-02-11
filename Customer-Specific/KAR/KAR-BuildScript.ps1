@@ -198,4 +198,9 @@ if ($myinput -eq '1') {start-script}
 if ($myinput -eq '2') {manual-script}
 }
 
+mkdir c:\temp > $null 2>&1
+Remove-Item c:\temp\scriptdownloads -recurse -force > $null 2>&1
+mkdir c:\temp\scriptdownloads > $null 2>&1
+
 start-mainmenu
+
