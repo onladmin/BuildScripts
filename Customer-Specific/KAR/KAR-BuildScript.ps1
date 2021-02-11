@@ -197,3 +197,5 @@ function start-mainmenu {
 if ($myinput -eq '1') {start-script}
 if ($myinput -eq '2') {manual-script}
 }
+
+start-mainmenu
