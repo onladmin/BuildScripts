@@ -14,9 +14,10 @@ $PhotoviewerInstall = 'https://github.com/onladmin/BuildScripts/raw/master/Regke
 $DefaultAppPre1909= 'https://github.com/onladmin/BuildScripts/raw/master/Regkeys_xmls/Pre1909DefaultAppAssociations.xml'
 $DefaultApp = 'https://github.com/onladmin/BuildScripts/raw/master/Regkeys_xmls/2004AppAssociations.xml'
 #$BloatwareRemoverWin10 = 'https://github.com/onladmin/BuildScripts/raw/master/Scripts/Uninstall_windows10_bloatware.ps1'
-#$HPBloatwareRemover = 'https://github.com/onladmin/BuildScripts/raw/master/Scripts/HP-Bloatware-removal.ps1'
-#$DellBloatwareRemover = 'https://github.com/onladmin/BuildScripts/raw/master/Scripts/Dell-Bloatware-Removal.ps1'
+$HPBloatwareRemover = 'https://github.com/onladmin/BuildScripts/raw/master/Scripts/HP-Bloatware-removal.ps1'
+$DellBloatwareRemover = 'https://github.com/onladmin/BuildScripts/raw/master/Scripts/Dell-Bloatware-Removal.ps1'
 
+############################################
 
 function start-software-install {
   $ProgressPreference = 'SilentlyContinue'
@@ -177,7 +178,144 @@ function start-bitlocker {
   Write-Output "Stored recovery key in C:\temp\"
 }
 
-################################################
+fucntion start-disablefirewall {
+  Invoke-Command {reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender Security Center\Systray" /v HideSystray /t reg_dword /d 1 /f} > $null 2>&1 # Removes Windows Defender from taskbar
+  Write-Output ''
+  Set-NetFirewallProfile -Profile Domain -Enabled False
+  Write-Output "Windows Firewall disabled for Domain network."
+}
+
+function start-disablessd-defrag {schtasks /Delete /TN "\Microsoft\Windows\Defrag\ScheduledDefrag"  /f}
+
+################################################ Last step options
+
+function start-rename-computer {
+  Clear-Host
+  do { $myInput = (Read-Host 'Would you like to re-name this computer? (Y/N)').ToLower() } while ($myInput -notin @('Y','N'))
+  if ($myinput -eq 'Y') {
+  Write-Output ''
+  $ComputerName = Read-Host -Prompt 'Enter the PC name you would like to rename to'
+  Rename-Computer -NewName "$ComputerName" -passthru
+  Write-Output ''
+  pause
+  }
+  else {
+  Write-Output "Will not rename computer..."
+  Clear-Host
+  }}
+  
+function start-joindomain {
+  Clear-Host
+  do { $myInput = (Read-Host 'Would you like to join this PC to a domain? (Y/N)').ToLower() } while ($myInput -notin @('Y','N'))
+  if ($myinput -eq 'Y') {
+  Write-Output ''
+  $DomainName = Read-Host -Prompt 'Enter the domain name to join this PC'
+  Write-Output ''
+  Write-Output "Use domain credentials to join the PC to domain. There will be a prompt on the screen to do this part."
+  Write-Output ''
+  Start-Sleep 5
+  add-computer –domainname "$DomainName" -PassThru -Options JoinWithNewName,AccountCreate
+  Write-Output ''
+  Write-Output "The above may not be accurate. (Because a restart is required to update the information)."
+  Write-Output ''
+  Write-Output "Just to be sure..."
+  Write-Output "Providing Hostname & Domain output..."
+  Write-Output ''
+  hostname
+  systeminfo | findstr /B "Domain"
+  Write-Output ''
+  Write-Output "Please check if the above information is correct and then continue."
+  pause
+  }
+  else {
+  Write-Output "PC Will not be joined to the domain."
+  Write-Output "Please continue."
+  Clear-Host
+}}
+  
+function start-power-config {
+  Clear-Host
+  Write-Output ''
+  Write-Output "Set power options."
+  Write-Output ''
+  Write-Output "Laptop: Hiberate on power button and do nothing when the lid closes. Show Hibernate button on start menu."
+  Write-Output "Desktop: Show hibernate button on start menu. Disable sleep."
+  Write-Output ''
+  do { $myInput = (Read-Host 'Change power settings?(laptop/desktop/N)').ToLower() } while ($myInput -notin @('laptop','desktop','N'))
+  if ($myinput -eq 'laptop') {
+  Write-Output ''
+  Write-Output "Modifying Power settings for laptop..."
+  Write-Output ''
+  powercfg -setdcvalueindex SCHEME_CURRENT 4f971e89-eebd-4455-a8de-9e59040e7347 7648efa3-dd9c-4e3e-b566-50f929386280 2
+  powercfg -setacvalueindex SCHEME_CURRENT 4f971e89-eebd-4455-a8de-9e59040e7347 7648efa3-dd9c-4e3e-b566-50f929386280 2
+  powercfg -setacvalueindex SCHEME_CURRENT sub_buttons lidaction 0
+  powercfg -setdcvalueindex SCHEME_CURRENT sub_buttons lidaction 0
+  powercfg -SetActive SCHEME_CURRENT
+  Invoke-Command {reg add HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings /v ShowHibernateOption /t reg_dword /d 1 /f}
+  Write-Output ''
+  Write-Output "Done."
+  Write-Output "Please continue."
+  Write-Output ''
+  pause
+  Clear-Host
+  }
+  if ($myinput -eq 'desktop') { 
+  Write-Output ''
+  Write-Output "Modifying Power settings for Desktop..."
+  Write-Output ''
+  Invoke-Command {reg add HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings /v ShowHibernateOption /t reg_dword /d 1 /f}
+  powercfg -change -standby-timeout-dc 0
+  powercfg -change -standby-timeout-ac 0
+  powercfg -SetActive SCHEME_CURRENT
+  Write-Output ''
+  Write-Output "Done."
+  Write-Output "Please continue."
+  Write-Output ''
+  pause
+  Clear-Host
+  }
+  if ($myinput -eq 'N') {
+  Write-Output ''
+  Write-Output "Not modifying power settings..."
+  pause
+  Clear-Host
+}}
+
+function start-bitlocker-updaterecovery {
+    Clear-Host
+    do { $myInput = (Read-Host 'Would you like to update Bitlocker recovery key?(Y/N)').ToLower() } while ($myInput -notin @('Y','N'))
+    if ($myinput -eq 'Y') {
+    Write-Output ''
+    Write-Output "Updating Bitlocker recovery key to AD..."
+    Write-Output ''
+    $BitLocker = Get-BitLockerVolume -MountPoint $env:SystemDrive
+    $RecoveryProtector = $BitLocker.KeyProtector | Where-Object { $_.KeyProtectorType -eq 'RecoveryPassword' }
+    
+    Backup-BitLockerKeyProtector -MountPoint $env:SystemDrive -KeyProtectorId $RecoveryProtector.KeyProtectorID
+    #BackupToAAD-BitLockerKeyProtector -MountPoint $env:SystemDrive -KeyProtectorId $RecoveryProtector.KeyProtectorID
+    Write-Output ''
+    Write-Output "Done."
+    Write-Output ''
+    #Write-Output "If you get an error regarding BackUptoAAD this is for AzureActive Directory so it can be safely ignored."
+    #Write-Output "Check that the recoverykey/password matches the one in the c:\temp if it is, remove the one in c:\temp and continue."
+    Write-Output "If you get any errors double check the computer is in the correct OU."
+    Write-Output "Please confirm the recovery key is in AD."
+    pause}
+    else {
+    Write-Output "Not updating bitlocker recovery."
+}}
+
+function start-dellbloatwareremoval {
+  Invoke-WebRequest $DellBloatwareRemover -outfile c:\temp\scriptdownloads\dellbloatwareremoval.ps1
+  powershell c:\temp\scriptdownloads\dellbloatwareremoval.ps1
+}
+
+function start-hpbloatwareremoval {
+  Invoke-WebRequest $HPBloatwareRemover -outfile c:\temp\scriptdownloads\hpbloatwareremoval.ps1
+  powershell c:\temp\scriptdownloads\hpbloatwareremoval.ps1
+}
+
+################################################ Menu
 
 function start-script {
   start-software-install
@@ -186,19 +324,29 @@ function start-script {
   start-modifyuac
   start-enablesystemrestore
   start-setdefault-timzeone
-  start-windows-update
+  start-disablefirewall
+  start-disablessd-defrag
+  start-windows-update #make sure this is last
 }
 
+function lastscript {
+start-rename-computer
+start-joindomain
+start-power-config
+start-bitlocker-updaterecovery
+start-dellbloatwareremoval
+start-hpbloatwareremoval
+}
 function start-mainmenu {
   Write-Output ''
   Write-Output "KAR Build Script."
   Write-Output ''
   Write-Output "Choose option 1 for automated."
-  Write-Output "Choose option 2 for the manual last steps."
+  Write-Output "Choose option 2 for the last steps."
   Write-Output ''
   do { $myInput = (Read-Host 'Type an option').ToLower() } while ($myInput -notin @('1','2','3'))
 if ($myinput -eq '1') {start-script}
-if ($myinput -eq '2') {manual-script}
+if ($myinput -eq '2') {last-script}
 }
 
 mkdir c:\temp > $null 2>&1
