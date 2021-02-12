@@ -19,3 +19,4 @@ function start-officeinstall {
     Write-Output "Office365 is now installed."
 }
 
+start-officeinstall
