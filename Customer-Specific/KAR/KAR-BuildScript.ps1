@@ -178,7 +178,7 @@ function start-bitlocker {
   Write-Output "Stored recovery key in C:\temp\"
 }
 
-fucntion start-disablefirewall {
+function start-disablefirewall {
   Invoke-Command {reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender Security Center\Systray" /v HideSystray /t reg_dword /d 1 /f} > $null 2>&1 # Removes Windows Defender from taskbar
   Write-Output ''
   Set-NetFirewallProfile -Profile Domain -Enabled False
