@@ -13,7 +13,7 @@ $NeteXtenderInstall= 'https://github.com/onladmin/BuildScripts/raw/master/Instal
 $PhotoviewerInstall = 'https://github.com/onladmin/BuildScripts/raw/master/Regkeys_xmls/Restore_Windows_Photo_Viewer_ALL_USERS.reg'
 $DefaultAppPre1909= 'https://github.com/onladmin/BuildScripts/raw/master/Regkeys_xmls/Pre1909DefaultAppAssociations.xml'
 $DefaultApp = 'https://github.com/onladmin/BuildScripts/raw/master/Regkeys_xmls/2004AppAssociations.xml'
-#$BloatwareRemoverWin10 = 'https://github.com/onladmin/BuildScripts/raw/master/Scripts/Uninstall_windows10_bloatware.ps1'
+$BloatwareRemoverWin10 = 'https://github.com/onladmin/BuildScripts/raw/master/Scripts/Automation%20Scripts/Auto-Windows10-Bloatware-remover.ps1'
 $HPBloatwareRemover = 'https://github.com/onladmin/BuildScripts/raw/master/Scripts/HP-Bloatware-removal.ps1'
 $DellBloatwareRemover = 'https://github.com/onladmin/BuildScripts/raw/master/Scripts/Dell-Bloatware-Removal.ps1'
 
@@ -57,6 +57,11 @@ function start-shortcuts-default-apps {
     Copy-Item "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Excel.lnk" -Destination "C:\Users\Public\Desktop\Excel.lnk"
     Copy-Item "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Powerpoint.lnk" -Destination "C:\Users\Public\Desktop\Powerpoint.lnk"
     Copy-Item "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Word.lnk" -Destination "C:\Users\Public\Desktop\Word.lnk"
+}
+
+function start-bloatwareremoval {
+  Invoke-WebRequest $BloatwareRemoverWin10 -outfile c:\temp\scriptdownloads\bloatwareremoval.ps1
+  powershell c:\temp\scriptdownloads\bloatwareremoval.ps1
 }
 
 function start-clearstartmenu {
@@ -320,6 +325,7 @@ function start-hpbloatwareremoval {
 function start-script {
   start-software-install
   start-shortcuts-default-apps
+  start-bloatwareremoval
   start-clearstartmenu
   start-modifyuac
   start-enablesystemrestore
