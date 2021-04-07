@@ -27,6 +27,7 @@ $UWPAppList = "AD2F1837.HPPrinterControl",
     "AD2F1837.HPWorkWell",
     "AD2F1837.HPQuickDrop",
     "AD2F1837.myHP",
+    "AD2F1837.HPSureView"
     "ExpressVPN",
     "McAfee Live"
 
@@ -59,6 +60,7 @@ $GAPApplist = "HP Documentation",
     "HP Performance Advisor"
 
 $GUIDApplist = "{6F340107-F9AA-47C6-B54C-C3A19F11553F}",
+      "{7F433DEB-EE46-41C2-8723-11CBFFD1803B}",
       "{36D6FFE0-888D-4680-AA7B-B1F896CAB9F6}",
       "{E5B9C3E5-889C-4F22-A959-F4B8465D8876}",
       "{A30F03AC-EF79-40E4-AA5F-414EB135AFCF}",
@@ -545,17 +547,21 @@ Write-Output "Removed UWP apps."
 }
 
 function start-GAP-removal {
+$ProgressPreference = 'SilentlyContinue'
 ForEach ($App in $GAPAppList) {
 Get-Package "$App" | Uninstall-Package -ErrorAction 'SilentlyContinue'
 Get-Package "$App" | ForEach-Object { & $_.Meta.Attributes['UninstallString'] /S } -ErrorAction 'SilentlyContinue'
 }
 Clear-Host            
 Write-Output "Removed apps using GAP."
+$ProgressPreference = 'Continue'
 }
 
 function start-GUID-removal {
+$ProgressPreference = 'SilentlyContinue'
 ForEach ($App in $GUIDAppList) {
-  Start-Process msiexec -Wait -ArgumentList '/X $App /qn /norestart'
+Start-Process msiexec -Wait -ArgumentList '/X $App /qn /norestart'
+$ProgressPreference = 'Continue'
 }            
 Write-Output "Removed apps using GUID."
 CMD /C "C:\Program Files\HP\Documentation\Doc_Uninstall.cmd"

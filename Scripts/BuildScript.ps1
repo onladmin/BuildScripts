@@ -10,7 +10,7 @@ $Version = Write-Output "Version 1.47"
 $lastupdatedby = Write-Output "Last Updated By MQ 21/01/2021"
 
 $WindowsVerison = (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion").CurrentBuild
-$LatestWindows = '19041' #Current Windows verison
+$LatestWindows = '19042' #Current Windows verison
 $OldWindows = '18363' #Anything under this or equal to
 
 #Download links.
@@ -21,10 +21,10 @@ $SoftwareInstall7zip = 'https://github.com/Ray-MRQ/MRQ/raw/master/Install%20file
 $SoftwareInstallJava = 'https://github.com/Ray-MRQ/MRQ/raw/master/Install%20files/jre1.8.0_26164.msi'
 $SoftwareInstallZoomFile = 'https://github.com/Ray-MRQ/MRQ/raw/master/Install%20files/ZoomInstallerFull.msi'
 $SoftwareInstallAdobeReader = 'https://onl-my.sharepoint.com/:u:/g/personal/mohammed_quashem_onlinesupport_co_uk/EcRWAKSO321GgevynQeMUzkBpZ-6wm-kHKs7_uScUdfZmw?e=4bhFXR&download=1'
-$Office365Install = 'https://github.com/Ray-MRQ/MRQ/raw/master/Scripts/Install_Office365Apps.ps1'
+$Office365Install = 'https://github.com/Ray-MRQ/MRQ/raw/master/Scripts/Office_Install.ps1'
 $MimecastInstall = 'https://github.com/Ray-MRQ/MRQ/raw/master/Install%20files/Mimecast%20for%20Outlook%207.0.1740.17532%20(32%20bit).msi'
 $GlobalVPNInstall = 'https://github.com/Ray-MRQ/MRQ/raw/master/Install%20files/GVCInstall64.msi'
-$NeteXtenderInstall= 'https://github.com/Ray-MRQ/MRQ/raw/master/Install%20files/NetExtender.8.6.265.MSI'
+$NeteXtenderInstall= 'https://github.com/Ray-MRQ/MRQ/raw/master/Install%20files/NetExtender-10.2.309.MSI'
 $PhotoviewerInstall = 'https://github.com/Ray-MRQ/MRQ/raw/master/Regkeys_xmls/Restore_Windows_Photo_Viewer_ALL_USERS.reg'
 $DefaultAppPre1909= 'https://github.com/Ray-MRQ/MRQ/raw/master/Regkeys_xmls/Pre1909DefaultAppAssociations.xml'
 $DefaultApp = 'https://github.com/Ray-MRQ/MRQ/raw/master/Regkeys_xmls/2004AppAssociations.xml'
@@ -43,7 +43,6 @@ $Version
 $lastupdatedby
 Write-Output ''
 Write-Output "This is a generic build script"
-Write-Output "If you would like to check the features of this script, use option 2 then go to option 0."
 Write-Output ''
 Write-Output "Option 1: Automated/ineractive install."
 Write-Output "Option 2: Manual select install"
@@ -56,12 +55,8 @@ if ($myinput -eq '3') {start-end-script}
 }
 
 function start-softwareinstall {
-Write-Output "Removing & creating directory in C:\temp\scriptdownloads..."
-mkdir c:\temp > $null 2>&1
-Remove-Item c:\temp\scriptdownloads -recurse -force > $null 2>&1
-mkdir c:\temp\scriptdownloads > $null 2>&1
-Write-Output "============================================================================="
 Clear-Host
+Write-Output "============================================================================="
 $createdby
 $Version
 $lastupdatedby
@@ -77,21 +72,19 @@ Write-Output ''
 pause
 Clear-Host
 start-officecheck
-Write-Output "If for whatever reason office did not install, you can re-install from manual selection Option 13."
-pause
 Write-Output ''
 Write-Output "Starting download and install for 7Zip, Java, Chrome & Adobe Reader..."
 $ProgressPreference = 'SilentlyContinue'
-Invoke-WebRequest $SoftwareInstallChrome -outfile c:\temp\scriptdownloads\chrome.msi
-Invoke-WebRequest $SoftwareInstall7zip -outfile c:\temp\scriptdownloads\7zip.msi
-Invoke-WebRequest $SoftwareInstallJava -outfile c:\temp\scriptdownloads\java.msi
-Invoke-WebRequest $SoftwareInstallAdobeReader -outfile c:\temp\scriptdownloads\adobereader.zip
-Expand-Archive -LiteralPath C:\temp\scriptdownloads\adobereader.zip -DestinationPath C:\temp\scriptdownloads\
+Invoke-WebRequest -Uri $SoftwareInstallChrome -outfile c:\temp\downloads\chrome.msi 
+Invoke-WebRequest -Uri $SoftwareInstall7zip -outfile c:\temp\downloads\7zip.msi 
+Invoke-WebRequest -Uri $SoftwareInstallJava -outfile c:\temp\downloads\java.msi 
+Invoke-WebRequest -Uri $SoftwareInstallAdobeReader -outfile c:\temp\downloads\adobereader.zip 
+Expand-Archive -LiteralPath c:\temp\downloads\adobereader.zip -DestinationPath c:\temp\downloads\ 
 $ProgressPreference = 'Continue'
-Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\scriptdownloads\chrome.msi /qn /norestart allusers=2'
-Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\scriptdownloads\7zip.msi /qn /norestart allusers=2'
-Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\scriptdownloads\java.msi /qn /norestart allusers=2'
-Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\scriptdownloads\adobereader\acroread.msi /qn /norestart allusers=2'
+Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\downloads\chrome.msi /qn /norestart allusers=2'
+Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\downloads\7zip.msi /qn /norestart allusers=2'
+Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\downloads\java.msi /qn /norestart allusers=2'
+Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\downloads\adobereader\acroread.msi /qn /norestart allusers=2'
 Write-Output ''
 Write-Output "Installed 7zip, Java, Chrome and Adobe reader silently."
 Write-Output ''
@@ -100,26 +93,26 @@ if ($myInput -eq 'y') {
 Write-Output ''
 Write-Output "Starting Zoom download..."
 $ProgressPreference = 'SilentlyContinue'
-Invoke-WebRequest $SoftwareInstallZoomFile -outfile c:\temp\scriptdownloads\ZoomInstaller.msi
+Invoke-WebRequest $SoftwareInstallZoomFile -outfile c:\temp\downloads\ZoomInstaller.msi -Verbose
 $ProgressPreference = 'Continue'
-Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\scriptdownloads\ZoomInstaller.msi /qn /norestart allusers=2'
+Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\downloads\ZoomInstaller.msi /qn /norestart allusers=2'
 }}
 
 function start-officecheck {
-Invoke-WebRequest $Office365Install -outfile C:\temp\scriptdownloads\office365install.ps1
-powershell C:\temp\scriptdownloads\office365install.ps1
+Invoke-WebRequest $Office365Install -outfile c:\temp\downloads\office365install.ps1
+powershell c:\temp\downloads\office365install.ps1
 }
 
 function start-officeuninstalltool {
 Write-Output "Office applications uninstall tool, with will open up an app."
 $ProgressPreference = 'SilentlyContinue'
-Invoke-WebRequest $OfficeUninstallTool -outfile C:\temp\scriptdownloads\officeuninstall.exe
+Invoke-WebRequest $OfficeUninstallTool -outfile c:\temp\downloads\officeuninstall.exe
 $ProgressPreference = 'Continue'
 Write-Output ''
 Write-Output "Downloading Office uninstall tool..."
 Write-Output ''
 Write-Output "Done, starting Office uninstall tool."
-C:\temp\scriptdownloads\officeuninstall.exe
+c:\temp\downloads\officeuninstall.exe
 Write-Output ''
 Write-Output "Go through the prompts then continue."
 pause
@@ -133,9 +126,9 @@ if ($myInput -eq 'y') {
 Write-Output ''
 Write-Output "Downloading & installing Mimecast for Outlook..."
 $ProgressPreference = 'SilentlyContinue'
-Invoke-WebRequest $MimecastInstall -outfile c:\temp\scriptdownloads\mimecast32bit.msi
+Invoke-WebRequest $MimecastInstall -outfile c:\temp\downloads\mimecast32bit.msi
 $ProgressPreference = 'Continue'
-Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\scriptdownloads\mimecast32bit.msi /qn /norestart allusers=2'
+Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\downloads\mimecast32bit.msi /qn /norestart allusers=2'
 Write-Output ''
 netsh advfirewall firewall add rule name="Mimecast.Services.Windows.Personal" dir=in action=allow program="C:\program files (x86)\mimecast\mimecast windows service\msddsk.exe" enable=yes
 Write-Output "Adding firewall rule..."
@@ -155,9 +148,9 @@ if ($myInput -eq 'global') {
 Write-Output ''
 Write-Output "Downloading & installing GlobalVPN..."
 $ProgressPreference = 'SilentlyContinue'
-Invoke-WebRequest $GlobalVPNInstall -outfile c:\temp\scriptdownloads\gvcinstall64.msi
+Invoke-WebRequest $GlobalVPNInstall -outfile c:\temp\downloads\gvcinstall64.msi
 $ProgressPreference = 'Continue'
-Start-Process msiexec.exe -Wait -ArgumentList '/i C:\temp\scriptdownloads\gvcinstall64.msi /qn /norestart allusers=2'
+Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\downloads\gvcinstall64.msi /qn /norestart allusers=2'
 Write-Output ''
 Write-Output "Adding firewall rule for GlobalVPN."
 netsh advfirewall firewall add rule name="SonicWall Global VPN Client" dir=in action=allow program="C:\program files\sonicwall\global vpn client\swgvc.exe" enable=yes
@@ -170,9 +163,9 @@ if ($myinput -eq 'net') {
 Write-Output ''
 Write-Output "Downloading & installing NeteXtender..."
 $ProgressPreference = 'SilentlyContinue'
-Invoke-WebRequest $NeteXtenderInstall -outfile c:\temp\scriptdownloads\netextender.msi
+Invoke-WebRequest $NeteXtenderInstall -outfile c:\temp\downloads\netextender.msi
 $ProgressPreference = 'Continue'
-Start-Process msiexec.exe -Wait -ArgumentList '/i C:\temp\scriptdownloads\netextender.msi /qn /norestart allusers=2'
+Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\downloads\netextender.msi /qn /norestart allusers=2'
 Write-Output ''
 Write-Output "NeteXtender should now be installed."
 Write-Output ''
@@ -193,9 +186,9 @@ Clear-Host
 do { $myInput = (Read-Host 'Would you like to install Photo Viewer? (Windows7 verision) (Y/N)').ToLower() } while ($myInput -notin @('y','n'))
 if ($myInput -eq 'y') {
 Write-Output "Installing photo viewer...."
-Invoke-WebRequest $PhotoviewerInstall -outfile c:\temp\scriptdownloads\Photoviewer.reg
-Invoke-Command {reg import C:\temp\scriptdownloads\Photoviewer.reg *>&1 | Out-Null}
-Remove-Item "c:\temp\scriptdownloads\photoviewer.reg"
+Invoke-WebRequest $PhotoviewerInstall -outfile c:\temp\downloads\Photoviewer.reg
+Invoke-Command {reg import c:\temp\downloads\Photoviewer.reg *>&1 | Out-Null}
+Remove-Item "c:\temp\downloads\photoviewer.reg"
 Write-Output "Photoviewer installed..."
 Write-Output "Please confirm if that is installed by checking with a compatible file type and change default photos app to this."
 Write-Output "-"
@@ -218,8 +211,8 @@ Write-Output "Otherwise option y should work fine."
 Write-Output ''
 do { $myInput = (Read-Host 'Please confirm with (Y/N) if you would like to remove Windows10Bloatware apps').ToLower() } while ($myInput -notin @('y','n'))
 if ($myInput -eq 'y') {
-Invoke-WebRequest $BloatwareRemoverWin10 -outfile c:\temp\scriptdownloads\bloatwareremover.ps1
-powershell c:\temp\scriptdownloads\bloatwareremover.ps1
+Invoke-WebRequest $BloatwareRemoverWin10 -outfile c:\temp\downloads\bloatwareremover.ps1
+powershell c:\temp\downloads\bloatwareremover.ps1
 Write-Output "Script complete..."
 $ProgressPreference = 'Continue'
 Clear-Host
@@ -237,8 +230,8 @@ Clear-Host
 do { $myInput = (Read-Host 'Is this a HP workstation/laptop? If so would you like to remove bloatware for this as well? (Y/N)').ToLower() } while ($myInput -notin @('y','n'))
 if ($myInput -eq 'y') {
 Write-Output "This may take a while..."
-Invoke-WebRequest $HPBloatwareRemover -outfile c:\temp\scriptdownloads\hpbloatwareremoval.ps1
-powershell c:\temp\scriptdownloads\hpbloatwareremoval.ps1
+Invoke-WebRequest $HPBloatwareRemover -outfile c:\temp\downloads\hpbloatwareremoval.ps1
+powershell c:\temp\downloads\hpbloatwareremoval.ps1
 Write-Output ''
 Write-Output "HP Bloatware has been removed or at least attempted to remove most."
 Write-Output ''
@@ -257,8 +250,8 @@ Clear-Host
 do { $myInput = (Read-Host 'Is this a Dell workstation/laptop? If so would you like to remove bloatware for this as well? (Y/N)').ToLower() } while ($myInput -notin @('y','n'))
 if ($myInput -eq 'y') {
 Write-Output "This may take a while..."
-Invoke-WebRequest $DellBloatwareRemover -outfile c:\temp\scriptdownloads\dellbloatwareremoval.ps1
-powershell c:\temp\scriptdownloads\dellbloatwareremoval.ps1
+Invoke-WebRequest $DellBloatwareRemover -outfile c:\temp\downloads\dellbloatwareremoval.ps1
+powershell c:\temp\downloads\dellbloatwareremoval.ps1
 Write-Output ''
 Write-Output "Dell Bloatware has been removed or at least attempted to remove most."
 Write-Output ''
@@ -280,11 +273,11 @@ Write-Output ''
 do { $myInput = (Read-Host 'Add shortcuts & default apps?(Y/N)').ToLower() } while ($myInput -notin @('y','n'))
 if ($myInput -eq 'y') {
 if ($WindowsVersion -le '1909') { 
-Invoke-WebRequest $DefaultAppPre1909 -outfile c:\temp\scriptdownloads\MyDefaultAppAssociations.xml 
-dism /online /Import-DefaultAppAssociations:"c:\temp\scriptdownloads\MyDefaultAppAssociations.xml" }
+Invoke-WebRequest $DefaultAppPre1909 -outfile c:\temp\downloads\MyDefaultAppAssociations.xml 
+dism /online /Import-DefaultAppAssociations:"c:\temp\downloads\MyDefaultAppAssociations.xml" }
 else {
-Invoke-WebRequest $DefaultApp -outfile c:\temp\scriptdownloads\MyDefaultAppAssociations.xml
-dism /online /Import-DefaultAppAssociations:"c:\temp\scriptdownloads\MyDefaultAppAssociations.xml" }
+Invoke-WebRequest $DefaultApp -outfile c:\temp\downloads\MyDefaultAppAssociations.xml
+dism /online /Import-DefaultAppAssociations:"c:\temp\downloads\MyDefaultAppAssociations.xml" }
 Write-Output "Sending office shortcuts to desktop..."
 #Add any shortcuts needed for the above here. It just copies from Start menu to public desktop.
 Copy-Item "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Outlook.lnk" -Destination "C:\Users\Public\Desktop\Outlook.lnk"
@@ -441,7 +434,7 @@ Clear-Host
 
 function start-bitlocker-updaterecovery {
 Clear-Host
-do { $myInput = (Read-Host 'Would you like to update Bitlocker recovery key?(Y/N)').ToLower() } while ($myInput -notin @('Y','N'))
+do { $myInput = (Read-Host '(Please check if the computer is in the right OU otherwise it will fail) Would you like to update Bitlocker recovery key?(Y/N)').ToLower() } while ($myInput -notin @('Y','N'))
 if ($myinput -eq 'Y') {
 Write-Output ''
 Write-Output "Updating Bitlocker recovery key to AD..."
@@ -619,8 +612,6 @@ do { $myInput = (Read-Host 'Set Timezone to UK and change default keyboard? (Y/N
 if ($myinput -eq 'Y') {
 set-timezone -id "GMT Standard Time" -passthru
 Get-Date -Format “dddd MM/dd/yyyy HH:mm K”
-Rename-Item -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Keyboard Layouts\00000409" -NewName "00000409-disabled"
-Set-WinDefaultInputMethodOverride -InputTip "0809:00000809"
 Write-Output 'Applied default timzone to GMT and applied default UK keyboard. (Setting keyboard has been problematic and not work.)'
 Write-Output ''
 Get-Date
@@ -670,7 +661,7 @@ Clear-Host
 #
 Write-Output "Starting windows updates..."
 Write-Output "Please wait..."
-$dir = 'C:\temp\scriptdownloads\packages'
+$dir = 'c:\temp\downloads\packages'
 Remove-Item $dir -recurse -force > $null 2>&1
 mkdir $dir > $null 2>&1
 $webClient = New-Object System.Net.WebClient
@@ -759,6 +750,11 @@ pause
 }
 
 function start-script {
+mkdir c:\temp > $null 2>&1
+Remove-Item c:\temp\scriptdownloads -recurse -force > $null 2>&1
+Remove-Item c:\temp\downloads -recurse -force > $null 2>&1
+mkdir c:\temp\downloads > $null 2>&1
+mkdir c:\temp\scriptdownloads > $null 2>&1
 start-addrunasps1
 start-softwareinstall
 start-mimecastinstall
@@ -772,10 +768,10 @@ start-clearstartmenu
 start-uac
 start-addrunasps1
 start-bitlocker
-start-bitlocker-updaterecovery
 start-disablefirewall-domain
 start-rename-computer
 start-joindomain
+start-bitlocker-updaterecovery
 start-power-config
 start-disable-defrag
 start-systemrestorepoint
@@ -796,6 +792,8 @@ Write-Output ''
 Write-Output "Removing & creating directory in C:\temp\scriptdownloads..."
 mkdir c:\temp > $null 2>&1
 Remove-Item c:\temp\scriptdownloads -recurse -force > $null 2>&1
+Remove-Item c:\temp\downloads -recurse -force > $null 2>&1
+mkdir c:\temp\downloads > $null 2>&1
 mkdir c:\temp\scriptdownloads > $null 2>&1
 Write-Output "Done."
 Write-Output ''
@@ -881,37 +879,6 @@ exit
 }
 #####################################################################################################################
 start-main-menu
-######################################################################################################################
 
-# SIG # Begin signature block
-# MIIFdQYJKoZIhvcNAQcCoIIFZjCCBWICAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
-# gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUVRDmhuWRBUmGnZNuk5odDKhA
-# eg2gggMVMIIDETCCAfmgAwIBAgIQVhOR9PCld55K0eL7v5x/hDANBgkqhkiG9w0B
-# AQsFADAVMRMwEQYDVQQDDApNb2hhbW1lZFJRMB4XDTIwMDkxNTE5NTMwMVoXDTIx
-# MDkxNTIwMTMwMVowFTETMBEGA1UEAwwKTW9oYW1tZWRSUTCCASIwDQYJKoZIhvcN
-# AQEBBQADggEPADCCAQoCggEBAMb9d6KoKjormPOMW/yUR9i8auOCBZNRxDAaDgJq
-# Utx5aRugHWyESPPFYbnKrqCmunFXBzKhvDWX9b1qMwo5oFX7AUAMCd6P2VB59jIJ
-# qPF/N/HvnuGvK08+IwcJ96yg4FZJPTi8BNYUTZZxnuwv3hHQtVfmg1HpUO1UyJII
-# DTtyzZKz6SdcEHL5W0OqiffHp44ZbAktJyWO1SYfN7J2AbdN34yUR2iCE5+hB97c
-# 3mVoKkLjzRBPmsDVUy8bsMIxUReQtgREJgR7VlZI7UxrYN1eT7nl8i/lVEiFtIXr
-# 6msI3FRrrygh+l4+FnpvGYFGBVrvGrYEXtcPT3UDYeG5ADUCAwEAAaNdMFswDgYD
-# VR0PAQH/BAQDAgeAMBMGA1UdJQQMMAoGCCsGAQUFBwMDMBUGA1UdEQQOMAyCCk1v
-# aGFtbWVkUlEwHQYDVR0OBBYEFMwK7mMAt1iN0ehfHdJ3FrpyA3dDMA0GCSqGSIb3
-# DQEBCwUAA4IBAQB/2cfhmZpeYnX8+0vrI8GrbgwLkFxcP0+hvBZQYiQSg/s3m2Rv
-# iBOkMQbjx8NwmzxSsyO44Q/nq/xtXuyXNWtKMjjx36E1ke1WyEMf6ozFVJ3dw+va
-# VDd9wj0gNPZoJkeLWsXSBKjwMDdsS0wI6l/N+9oPBoa3kDMjWCJ1BLmwp3WF97sz
-# XVO4Nhp4egicI2c5wpKu3cY3Su/WCOheU5Qg9jTI0TEB/LYKte5fRTX8h1VzyTwC
-# BAxruLb5D10XegbBJChl3LBiFXgVVvhaK12lqwM8eAOwdPwTO92ZdIMYqYjRhKI+
-# 15K0TsSmp5eLdBt0bG3+NmnwKPmLOdnDnaMpMYIByjCCAcYCAQEwKTAVMRMwEQYD
-# VQQDDApNb2hhbW1lZFJRAhBWE5H08KV3nkrR4vu/nH+EMAkGBSsOAwIaBQCgeDAY
-# BgorBgEEAYI3AgEMMQowCKACgAChAoAAMBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3
-# AgEEMBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEW
-# BBQVRGgv8Yp9uk8XqN0jvd/tlbRxlDANBgkqhkiG9w0BAQEFAASCAQBxsPqFD9Ny
-# HMGrIWnIYx5o7ncrtValZMF8qttZEWe1BChe9tH/C3GdqXrqyZ6frS5qsgbo/fFI
-# MmZaImrD1dB5GCyHBcm1kWRG7tvaDB2c4uTIHZkpPQiHfaEf8EXvb2NWCIhy0kN9
-# T/vj//+mUQAP/utnmkanb5uNInm6WW47hjyq7CPOfV+sXmnmum1XDLpB2cotn122
-# bHDz8vf6AipwVr6+TZFGSG98OWBpaUvnS3t7BVCZjZtmU/IEWGUQ7G+adQbPxmT3
-# 5PxcXplYfOlzVDaKiNskNXY8xauPScGH2MrpZLoAK8Rtpxb95Ez2IXy60DuCEdN/
-# /6lXTuOZ/uCz
-# SIG # End signature block
+
+#Force clear
