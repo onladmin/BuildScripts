@@ -6,8 +6,8 @@
 }
 Clear-Host
 $createdby = Write-Output "Created By MQ 08/09/2020"
-$Version = Write-Output "Version 1.47"
-$lastupdatedby = Write-Output "Last Updated By MQ 21/01/2021"
+$Version = Write-Output "Version 1.53"
+$lastupdatedby = Write-Output "Last Updated By MQ 16/04/2022"
 
 $WindowsVerison = (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion").CurrentBuild
 $LatestWindows = '19042' #Current Windows verison
@@ -16,11 +16,6 @@ $OldWindows = '18363' #Anything under this or equal to
 #Download links.
 
 $OfficeUninstallTool = 'https://outlookdiagnostics.azureedge.net/sarasetup/SetupProd_OffScrub.exe'
-$SoftwareInstallChrome = 'https://github.com/Ray-MRQ/MRQ/raw/master/Install%20files/GoogleChromeStandaloneEnterprise64.msi'
-$SoftwareInstall7zip = 'https://github.com/Ray-MRQ/MRQ/raw/master/Install%20files/7z1604-x64.msi'
-$SoftwareInstallJava = 'https://github.com/Ray-MRQ/MRQ/raw/master/Install%20files/jre1.8.0_26164.msi'
-$SoftwareInstallZoomFile = 'https://github.com/Ray-MRQ/MRQ/raw/master/Install%20files/ZoomInstallerFull.msi'
-$SoftwareInstallAdobeReader = 'https://onl-my.sharepoint.com/:u:/g/personal/mohammed_quashem_onlinesupport_co_uk/EcRWAKSO321GgevynQeMUzkBpZ-6wm-kHKs7_uScUdfZmw?e=4bhFXR&download=1'
 $Office365Install = 'https://github.com/Ray-MRQ/MRQ/raw/master/Scripts/Office_Install.ps1'
 $MimecastInstall = 'https://github.com/Ray-MRQ/MRQ/raw/master/Install%20files/Mimecast%20for%20Outlook%207.9.0.79%20(32%20bit).msi'
 $GlobalVPNInstall = 'https://github.com/Ray-MRQ/MRQ/raw/master/Install%20files/GVCInstall64.msi'
@@ -55,6 +50,9 @@ if ($myinput -eq '3') {start-end-script}
 }
 
 function start-softwareinstall {
+mkdir c:\temp > $null 2>&1
+Remove-Item c:\temp\downloads -recurse -force > $null 2>&1
+mkdir c:\temp\downloads > $null 2>&1
 Clear-Host
 Write-Output "============================================================================="
 $createdby
@@ -72,30 +70,16 @@ Write-Output ''
 pause
 Clear-Host
 start-officecheck
-Write-Output ''
-Write-Output "Starting download and install for 7Zip, Java, Chrome & Adobe Reader..."
-$ProgressPreference = 'SilentlyContinue'
-Invoke-WebRequest -Uri $SoftwareInstallChrome -outfile c:\temp\downloads\chrome.msi 
-Invoke-WebRequest -Uri $SoftwareInstall7zip -outfile c:\temp\downloads\7zip.msi 
-Invoke-WebRequest -Uri $SoftwareInstallJava -outfile c:\temp\downloads\java.msi 
-Invoke-WebRequest -Uri $SoftwareInstallAdobeReader -outfile c:\temp\downloads\adobereader.zip 
-Expand-Archive -LiteralPath c:\temp\downloads\adobereader.zip -DestinationPath c:\temp\downloads\ 
-$ProgressPreference = 'Continue'
-Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\downloads\chrome.msi /qn /norestart allusers=2'
-Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\downloads\7zip.msi /qn /norestart allusers=2'
-Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\downloads\java.msi /qn /norestart allusers=2'
-Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\downloads\adobereader\acroread.msi /qn /norestart allusers=2'
-Write-Output ''
-Write-Output "Installed 7zip, Java, Chrome and Adobe reader silently."
-Write-Output ''
+[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+Clear-Host
+choco install googlechrome 7zip silverlight -y --ignorechecksum
+choco install jre8 -PackageParameters "/exclude:32" -y --ignorechecksum
+choco install adobereader -params '"/DesktopIcon"' -y --ignorechecksum
+Clear-Host
 do { $myInput = (Read-Host 'Would you like to install Zoom?(Y/N)').ToLower() } while ($myInput -notin @('y','n'))
 if ($myInput -eq 'y') {
 Write-Output ''
-Write-Output "Starting Zoom download..."
-$ProgressPreference = 'SilentlyContinue'
-Invoke-WebRequest $SoftwareInstallZoomFile -outfile c:\temp\downloads\ZoomInstaller.msi -Verbose
-$ProgressPreference = 'Continue'
-Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\downloads\ZoomInstaller.msi /qn /norestart allusers=2'
+choco install zoom zoom-outlook -y --ignorechecksum
 }}
 
 function start-officecheck {
@@ -106,7 +90,7 @@ powershell c:\temp\downloads\office365install.ps1
 function start-officeuninstalltool {
 Write-Output "Office applications uninstall tool, with will open up an app."
 $ProgressPreference = 'SilentlyContinue'
-Invoke-WebRequest $OfficeUninstallTool -outfile c:\temp\downloads\officeuninstall.exe
+Invoke-WebRequest $OfficeUninstallTool -outfile c:\temp\downloads\officeuninstall.exe 
 $ProgressPreference = 'Continue'
 Write-Output ''
 Write-Output "Downloading Office uninstall tool..."
@@ -163,7 +147,7 @@ if ($myinput -eq 'net') {
 Write-Output ''
 Write-Output "Downloading & installing NeteXtender..."
 $ProgressPreference = 'SilentlyContinue'
-Invoke-WebRequest $NeteXtenderInstall -outfile c:\temp\downloads\netextender.msi
+Invoke-WebRequest $NeteXtenderInstall -outfile c:\temp\downloads\netextender.msi 
 $ProgressPreference = 'Continue'
 Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\downloads\netextender.msi /qn /norestart allusers=2'
 Write-Output ''
@@ -186,7 +170,7 @@ Clear-Host
 do { $myInput = (Read-Host 'Would you like to install Photo Viewer? (Windows7 verision) (Y/N)').ToLower() } while ($myInput -notin @('y','n'))
 if ($myInput -eq 'y') {
 Write-Output "Installing photo viewer...."
-Invoke-WebRequest $PhotoviewerInstall -outfile c:\temp\downloads\Photoviewer.reg
+Invoke-WebRequest $PhotoviewerInstall -outfile c:\temp\downloads\Photoviewer.reg 
 Invoke-Command {reg import c:\temp\downloads\Photoviewer.reg *>&1 | Out-Null}
 Remove-Item "c:\temp\downloads\photoviewer.reg"
 Write-Output "Photoviewer installed..."
@@ -211,7 +195,7 @@ Write-Output "Otherwise option y should work fine."
 Write-Output ''
 do { $myInput = (Read-Host 'Please confirm with (Y/N) if you would like to remove Windows10Bloatware apps').ToLower() } while ($myInput -notin @('y','n'))
 if ($myInput -eq 'y') {
-Invoke-WebRequest $BloatwareRemoverWin10 -outfile c:\temp\downloads\bloatwareremover.ps1
+Invoke-WebRequest $BloatwareRemoverWin10 -outfile c:\temp\downloads\bloatwareremover.ps1 
 powershell c:\temp\downloads\bloatwareremover.ps1
 Write-Output "Script complete..."
 $ProgressPreference = 'Continue'
@@ -230,7 +214,7 @@ Clear-Host
 do { $myInput = (Read-Host 'Is this a HP workstation/laptop? If so would you like to remove bloatware for this as well? (Y/N)').ToLower() } while ($myInput -notin @('y','n'))
 if ($myInput -eq 'y') {
 Write-Output "This may take a while..."
-Invoke-WebRequest $HPBloatwareRemover -outfile c:\temp\downloads\hpbloatwareremoval.ps1
+Invoke-WebRequest $HPBloatwareRemover -outfile c:\temp\downloads\hpbloatwareremoval.ps1 
 powershell c:\temp\downloads\hpbloatwareremoval.ps1
 Write-Output ''
 Write-Output "HP Bloatware has been removed or at least attempted to remove most."
@@ -250,7 +234,7 @@ Clear-Host
 do { $myInput = (Read-Host 'Is this a Dell workstation/laptop? If so would you like to remove bloatware for this as well? (Y/N)').ToLower() } while ($myInput -notin @('y','n'))
 if ($myInput -eq 'y') {
 Write-Output "This may take a while..."
-Invoke-WebRequest $DellBloatwareRemover -outfile c:\temp\downloads\dellbloatwareremoval.ps1
+Invoke-WebRequest $DellBloatwareRemover -outfile c:\temp\downloads\dellbloatwareremoval.ps1 
 powershell c:\temp\downloads\dellbloatwareremoval.ps1
 Write-Output ''
 Write-Output "Dell Bloatware has been removed or at least attempted to remove most."
@@ -661,9 +645,7 @@ Clear-Host
 #
 Write-Output "Starting windows updates..."
 Write-Output "Please wait..."
-$dir = 'c:\temp\downloads\packages'
-Remove-Item $dir -recurse -force > $null 2>&1
-mkdir $dir > $null 2>&1
+$dir = c:\temp\downloads
 $webClient = New-Object System.Net.WebClient
 $url = 'https://go.microsoft.com/fwlink/?LinkID=799445'
 $file = "$($dir)\Win10Upgrade.exe"
@@ -713,7 +695,6 @@ Write-Output ''
 Write-Output "Not installing windows updates..."
 Write-Output ''
 pause
-Clear-Host
 }}
 
 function start-echofeatures {
@@ -751,10 +732,8 @@ pause
 
 function start-script {
 mkdir c:\temp > $null 2>&1
-Remove-Item c:\temp\scriptdownloads -recurse -force > $null 2>&1
 Remove-Item c:\temp\downloads -recurse -force > $null 2>&1
 mkdir c:\temp\downloads > $null 2>&1
-mkdir c:\temp\scriptdownloads > $null 2>&1
 start-addrunasps1
 start-softwareinstall
 start-mimecastinstall
@@ -778,8 +757,6 @@ start-systemrestorepoint
 start-setdefault-timezone
 start-windows-update # MAKE SURE THIS IS THE LAST ONE ON THE LSIT
 Clear-Host
-Write-Output "This will now return to main menu, if you wish to exit, exit from the menu."
-Write-Output "If you would like to re-run a install that didn't work, use option 1 from the menu."
 start-main-menu
 }
 
@@ -791,10 +768,8 @@ $lastupdatedby
 Write-Output ''
 Write-Output "Removing & creating directory in C:\temp\scriptdownloads..."
 mkdir c:\temp > $null 2>&1
-Remove-Item c:\temp\scriptdownloads -recurse -force > $null 2>&1
 Remove-Item c:\temp\downloads -recurse -force > $null 2>&1
 mkdir c:\temp\downloads > $null 2>&1
-mkdir c:\temp\scriptdownloads > $null 2>&1
 Write-Output "Done."
 Write-Output ''
 Write-Output "Manual install has been selected, please choose what you would like to install selectively."
@@ -870,9 +845,9 @@ $lastupdatedby
 Write-Output ''
 Write-Output "End of script."
 Write-Output ''
-Write-Output "Clearing c:\temps\scriptdownloads."
-Remove-item c:\temp\scriptdownloads -recurse -force > $null 2>&1
-Write-Output "Done..."
+#Write-Output "Clearing c:\temps\scriptdownloads."
+#Remove-item c:\temp\downloads -recurse -force > $null 2>&1
+#Write-Output "Done..."
 Write-Output ''
 pause
 exit
